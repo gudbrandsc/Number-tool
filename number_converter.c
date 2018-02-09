@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+
 /*Flips all bits in a bit array and returns it*/
 char* bit_flip(char *bits){
   char *flipBits = (char *)malloc(strlen(bits)+1);
@@ -40,10 +41,23 @@ char *int_to_bits(int n) {
 unsigned bits_to_int(char *bits){
   unsigned int val = 0;
   size_t bit_length = strlen(bits);
-
-  for(int i = 3; i < bit_length; i++){
-    if (bits[i] == '1') val = val * 2 + 1;
-    else if (bits[i] == '0') val *= 2;
+  printf("length%u\n",bit_length);
+  if(bit_length != 34){
+    for(int i = 2; i < bit_length; i++){
+      if (bits[i] == '1'){
+	val = val * 2 + 1;
+      }else if (bits[i] == '0'){
+	val *= 2;
+      }
+    }
+  }else{
+    for(int i = 3; i < bit_length; i++){
+      if (bits[i] == '1'){
+	val = val * 2 + 1;
+      }else if (bits[i] == '0'){
+	val *= 2;
+      }
+    }
   }
   return val;
 }
@@ -51,7 +65,8 @@ unsigned bits_to_int(char *bits){
 /*Return a unsigned int value of the bit*/
 unsigned bits_to_unsigned(char *bits){
   unsigned int val = 0;
-  if (bits[2]=='1'){
+  printf("%",strlen(bits));
+  if (bits[2]=='1' && strlen(bits)==34){
     char* flipbit = bit_flip(bits);
     //Check if i should cast this
     val = (bits_to_int(flipbit) + 1) * -1;
@@ -245,11 +260,9 @@ unsigned int verify_argv_value(char* value){
 
       return unsigned_value;
     }
-  }else if(value[0]=='0' && value[1]=='b' && value_size > 2){// If value is a binary
+  }else if(value[0]=='0' && value[1]=='b'){// If value is a binary
     if(check_if_binary(value_size, value) == 0){
       unsigned_value = convert_value(3, value);
-      format_and_print_bits(int_to_bits(unsigned_value));
-      printf("0b%s (base 2)\n",int_to_bits(unsigned_value));
       printf("0x%X (base 16)\n",unsigned_value);
       printf("%u (base 10 unsigned)\n",unsigned_value);
       printf("%d (base 10 signed)\n",unsigned_value);
