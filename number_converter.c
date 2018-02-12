@@ -3,9 +3,18 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include<limits.h>
 
 #define MAX_STR_LEN 64
+
+
+unsigned int change_bit_width(int width, unsigned int value){
+  unsigned  mask;
+  unsigned int new_value;
+  mask = (1 << width) - 1;
+  new_value = value & mask;
+  return new_value;
+}
 
 /*Flips all bits in a bit array and returns it*/
 char* bit_flip(char *bits){
@@ -71,9 +80,13 @@ unsigned int bits_to_int(char *bits){
 }
 
 /*Return a unsigned int value of the bit*/
-void bits_to_unsigned(char *bits, unsigned int* unsigned_value){
+int bits_to_unsigned(char *bits, unsigned int* unsigned_value){
   unsigned int value = 0;
-
+  size_t bit_length = strlen(bits);
+ 
+  if(bit_length > 34){
+    return 1;
+  }
   if (bits[2] == '1' && strlen(bits) == 34){
     char* flipbit = bit_flip(bits);
     value = (bits_to_int(flipbit) + 1) * -1;
@@ -83,13 +96,15 @@ void bits_to_unsigned(char *bits, unsigned int* unsigned_value){
   }
   *unsigned_value = value;
 
-  return;
+  return 0;
 }
 
 /*Prints a whitespace for each 4th bit*/
-void format_and_print_bits(char* bits){
+void print_bit_in_group(int number_of_bits,char* bits){
   int count = 0;
-  for(int i = 0; i <= strlen(bits);i++){
+  size_t bit_length = strlen(bits);
+  int start = bit_length - number_of_bits;
+  for(int i = start ; i <= bit_length;i++){
     if(count%4 == 0 && count != 0){
       printf(" ");
     }
@@ -99,95 +114,138 @@ void format_and_print_bits(char* bits){
   printf(" (Base 2)\n");
 }
 
+/*Prints bit value with 0b prefix*/
+void print_bits_with_prefix(int number_of_bits,char* bits){
+  int count = 0;
+  size_t bit_length = strlen(bits);
+  int start = bit_length - number_of_bits;
+  printf("0b");
+  for(int i = start ; i <= bit_length;i++){
+    printf("%c",bits[i]);
+    count += 1;
+  }
+  printf(" (Base 2)\n");
+}
+
+
+/*Prints bit value with 0b prefix*/
+void print_hexadecimal(int number_of_bits,char* bits){
+  int count = 0;
+  size_t bit_length = strlen(bits);
+  int start = bit_length - number_of_bits;
+  printf("0b");
+  for(int i = start ; i <= bit_length;i++){
+    printf("%c",bits[i]);
+    count += 1;
+  }
+  printf(" (Base 2)\n");
+}
+
 /*Return a unsigned int value of the bit*/
-void hex_to_unsigned(char *bits, unsigned int* unsigned_value){
-  unsigned int value = 0;
+int hex_to_unsigned(char *bits, unsigned int* unsigned_value){
+  int value = 0;
   size_t bit_length = strlen(bits);
   int power = 1;
-
+  int place = 0;
   for(int i = bit_length-1; i > 1; i--){
     switch(bits[i]) {
     case '0' :
       break;
     case '1' :
-      value += power * 1;
+      place = 1;
       break;
     case '2' :
-      value += power * 2;
+      place = 2;
       break;
     case '3' :
-      value += power * 3;
+      place = 3;
       break;
     case '4' :
-      value += power * 4;
+      place = 4;
       break;
     case '5' :
-      value += power * 5;
+      place = 5;
       break;
     case '6' :
-      value += power * 6;
+      place = 6;
       break;
     case '7' :
-      value += power * 7;
+      place = 7;
       break;
     case '8' :
-      value += power * 8;
+      place = 8;
       break;
     case '9' :
-      value += power * 9;
+      place = 9;
       break;
     case 'A' :
-      value += power * 10;
+      place = 10;
       break;
     case 'B' :
-      value += power * 11;
+      place = 11;
       break;
     case 'C' :
-      value += power * 12;
+      place = 12;
       break;
     case 'D' :
-      value += power * 13;
+      place = 13;
       break;
     case 'E' :
-      value += power * 14;
+      place = 14;
       break;
     case 'F' :
-      value += power * 15;
+      place = 15;
       break;
     }
+    value += place * power;
+    if(value < 0){
+      return 1;
+    }
     power *= 16;
-  } 
- *unsigned_value = value;
+  }
+  *unsigned_value = (unsigned)value;
 
- return;
+ return 0;
 }
 /*Convert char array of numbers to unsigned int*/
-void pos_int_to_unsigned(char* value, unsigned int* unsigned_value) {
-  unsigned int intvalue = 0;
+int pos_int_to_unsigned(char* value, unsigned int* unsigned_value) {
+  int int_value = 0;
   int multi = 1;
   int currVal;
 
   for(int i = strlen(value)-1; i >= 0; i--){
-    intvalue += ((value[i]-'0') * multi);
+    int_value += ((value[i]-'0') * multi);
+    if(int_value < 0){
+      return 1;
+    }
     multi = (multi*10);
   }
- *unsigned_value = intvalue;
+  
+  *unsigned_value = (unsigned)int_value;
 
- return;
+ return 0;
 }
 
-void negativ_int_to_unsigned(char* value, unsigned int* unsigned_value){
+int negativ_int_to_unsigned(char* value, unsigned int* unsigned_value){
   int int_value = 0;
   int multi = 1;
   int curr_val;
 
   for(int i = strlen(value) - 1; i >= 1; i--){
-    int_value += ((value[i] - '0') * multi);
+    int_value += ((value[i] - '0') * multi); 
+    if(int_value < 0){
+      return 1;
+    }
+   
     multi = (multi * 10);
   }
+
   int_value = int_value * (-1);
+  
+ 
   *unsigned_value = (unsigned int) int_value;
-  return;
+  
+  return 0;
 }
 
 int check_if_negativ_int(int value_size, char* value) {
@@ -209,9 +267,10 @@ int check_if_int(int value_size, char* value) {
 }
 
 int check_if_hexadecimal(int value_size, char* value) {
+
   for(int i = 2; i < value_size; i++){
     if(!isxdigit(value[i])){
-      printf("%c\n",value[i]);
+      printf("%c is not a valid hex char\n",value[i]);
       return 1;
     }
   }
@@ -226,11 +285,27 @@ int check_if_binary(int value_size, char* value) {
   }
   return 0;
 }
+/*Convert char array of numbers to unsigned int*/
+int chararray_to_integer(char* value) {
+  int int_value = 0;
+  int multi = 1;
+  int currVal;
+
+  for(int i = strlen(value)-1; i >= 0; i--){
+    int_value += ((value[i]-'0') * multi);
+    if(int_value < 0){
+      return 1;
+    }
+    multi = (multi*10);
+  }
+  
+  return int_value;
+}
 
 
 //Remove som verify argv value can call methods
 void convert_value(int type, char* value, unsigned int* unsigned_value){
-
+ 
   if(type == 1){
     negativ_int_to_unsigned (value, unsigned_value);
   }else if(type == 2){
@@ -239,43 +314,126 @@ void convert_value(int type, char* value, unsigned int* unsigned_value){
     bits_to_unsigned(value, unsigned_value);
   }else if(type == 4){
     pos_int_to_unsigned(value, unsigned_value);
-  }else if(type == 0){
-    printf("%s\n","its not a valid number" );
   }
-  return ;
+  return;
 }
 
-unsigned int verify_argv_value(char* value){
+int verify_argv_value(int bitwidth, char* value){
   int value_size = strlen(value);
-  char binstr[MAX_STR_LEN];
-   unsigned int unsigned_value;
+  
+  int valid_number_type;
 
   if(value[0]=='-' && isdigit(value[1])){//If value is negativ
     if(check_if_negativ_int(value_size, value) == 0){
-      convert_value(1, value, &unsigned_value);
+      valid_number_type = 1;
     }
   }else if(value[0]=='0' && value[1]=='x' && value_size > 2){//If value is hexadecimal
     if(check_if_hexadecimal(value_size, value) == 0){
-      convert_value(2, value, &unsigned_value);
+      valid_number_type = 2;
     }
   }else if(value[0]=='0' && value[1]=='b'){// If value is a binary
     if(check_if_binary(value_size, value) == 0){
-      convert_value(3, value, &unsigned_value);
+      valid_number_type = 3;
     }
   }else if(check_if_int(value_size, value)==0){ //If value is a possetiv integer
-    convert_value(4, value, &unsigned_value);
+    valid_number_type = 4;
+  }else{
+    valid_number_type = 0;
   }
-  int_to_bits(binstr, unsigned_value);
-  format_and_print_bits(binstr);
-  printf("0b%s (base 2)\n",binstr);
-  printf("0x%08X (base 16)\n",unsigned_value);
-  printf("%u (base 10 unsigned)\n",unsigned_value);
-  printf("%d (base 10 signed)\n",unsigned_value);
-  return unsigned_value;
+
+  return valid_number_type;
+}
+void print_info_to_consol(int bitwidth, unsigned int value){
+  char binstr[MAX_STR_LEN];
+  int_to_bits(binstr, value);
+  print_bit_in_group(bitwidth,binstr);
+  print_bits_with_prefix(bitwidth,binstr);
+  if(bitwidth==32){
+    printf("0x%08X (base 16)\n",value);
+  }else{
+    printf("0x%X (base 16)\n",value);
+  }
+  
+  printf("%u (base 10 unsigned)\n",value);
+  printf("%d (base 10 signed)\n",value);
+}
+
+int args_handler(int argc, char** argv){
+  unsigned int unsigned_value;
+  int bitwidth_argv_length;
+  int bitwidth;
+  int value_type;
+  unsigned int updated_value;
+
+  if(argc == 2){
+    value_type = verify_argv_value(bitwidth,argv[1]);	
+    if(value_type == 0){
+      printf("Invalid value\n");
+    }else{
+      convert_value(value_type,argv[1], &unsigned_value);
+      print_info_to_consol(32,unsigned_value);
+    }
+    
+  }else if(argc == 4){
+    char* first_argv = argv[1];
+    char* sec_argv = argv[2];
+    char* third_argv = argv[3];
+    
+    if(first_argv[0] =='-' && first_argv[1] == 'b'){
+      if(check_if_int (bitwidth_argv_length, sec_argv) == 0){
+	bitwidth = chararray_to_integer(sec_argv);
+	if((bitwidth <= 32) && (bitwidth % 4 == 0)){
+	  value_type = verify_argv_value(bitwidth,third_argv);	
+	  if(value_type == 0){
+	    printf("Invalid value\n");
+	  }else{
+	    convert_value(value_type,third_argv, &unsigned_value);
+	    if(bitwidth == 32){
+	      print_info_to_consol(bitwidth,unsigned_value);
+	    }else{
+	      updated_value = change_bit_width(bitwidth, unsigned_value);
+	      print_info_to_consol(bitwidth, updated_value);
+	    }
+	  }
+	}else{
+	  printf("bitwidth not supported\n");
+	}
+      }else{
+	printf("Invalid bitwidth\n");
+      }
+    }else if(sec_argv[0] =='-' && sec_argv[1] == 'b'){
+      if(check_if_int (bitwidth_argv_length, third_argv) == 0){
+	bitwidth = chararray_to_integer(third_argv);;
+	if((bitwidth <= 32) && (bitwidth % 4 == 0)){
+	  value_type = verify_argv_value(bitwidth,first_argv);
+	  if(value_type == 0){
+	    printf("Invalid value\n");
+	  }else{
+	    convert_value(value_type,first_argv, &unsigned_value);
+	    if(bitwidth == 32){
+	       print_info_to_consol(bitwidth, unsigned_value);
+	    }else{
+	      updated_value = change_bit_width(bitwidth, unsigned_value);
+	      print_info_to_consol(bitwidth, updated_value);
+	    }
+	  }
+	}else{
+	  printf("bitwidth not supported\n");
+	}
+      }else{
+	printf("Invalid bitwidth\n");
+      }
+    }
+  }else{
+    printf("Invalid argument input\n");
+    return 1;
+  }
+  return 0;
 }
 
 int main(int argc, char* argv[]) {
-  unsigned int unsigned_value = verify_argv_value(argv[1]);
-  printf("%u",unsigned_value);
+  //unsigned int unsigned_value = verify_argv_value(argv[1]);
+  //unsigned int new_width = change_bit_width (8,unsigned_value);
+  int success = args_handler(argc, argv);
   return 0;
 }
