@@ -16,6 +16,11 @@ unsigned int change_bit_width(int width, unsigned int value){
   return new_value;
 }
 
+unsigned int get_value_from_bitrange(int lsb, int msb, unsigned int value ){
+  unsigned int result = (value >> lsb) & ~(~0 << (msb-lsb+1));
+  return result;
+
+}
 /*Flips all bits in a bit array and returns it*/
 char* bit_flip(char *bits){
   char *flip_bits = (char *)malloc(strlen(bits)+1);
@@ -49,7 +54,7 @@ void int_to_bits(char* s, unsigned int v) {
   }
 
   s[i] = '\0';
-
+  
   return;
 }
 
@@ -318,9 +323,8 @@ void convert_value(int type, char* value, unsigned int* unsigned_value){
   return;
 }
 
-int verify_argv_value(int bitwidth, char* value){
+int verify_argv_value(char* value){
   int value_size = strlen(value);
-  
   int valid_number_type;
 
   if(value[0]=='-' && isdigit(value[1])){//If value is negativ
@@ -343,6 +347,7 @@ int verify_argv_value(int bitwidth, char* value){
 
   return valid_number_type;
 }
+
 void print_info_to_consol(int bitwidth, unsigned int value){
   char binstr[MAX_STR_LEN];
   int_to_bits(binstr, value);
@@ -358,6 +363,69 @@ void print_info_to_consol(int bitwidth, unsigned int value){
   printf("%d (base 10 signed)\n",value);
 }
 
+void bitwidth_handler(char* bitwidth_input, char* value){
+  unsigned int unsigned_value;
+  unsigned int updated_value;
+  int bitwidth_argv_length = strlen(bitwidth_input);
+  int bitwidth;
+  int value_type;
+  if(check_if_int (bitwidth_argv_length, bitwidth_input) == 0){
+	bitwidth = chararray_to_integer(bitwidth_input);
+	if((bitwidth <= 32) && (bitwidth % 4 == 0)){
+	  value_type = verify_argv_value(value);	
+	  if(value_type == 0){
+	    printf("Invalid value\n");
+	  }else{
+	    convert_value(value_type,value, &unsigned_value);
+	    if(bitwidth == 32){
+	      print_info_to_consol(bitwidth,unsigned_value);
+	    }else{
+	      updated_value = change_bit_width(bitwidth, unsigned_value);
+	      print_info_to_consol(bitwidth, updated_value);
+	    }
+	  }
+	}else{
+	  printf("bitwidth not supported\n");
+	}
+  }else{
+    printf("Invalid bitwidth\n");
+  }
+}
+void get_bitrange(char* values){
+  
+}
+void bit_twiddel_handler(char* range_input, char* value){
+  unsigned int unsigned_value;
+  unsigned int updated_value;
+  int value_type;
+  int msb;
+  int lsb;
+
+    
+  
+  value_type = verify_argv_value(value);	
+  if(value_type == 0){
+    printf("Invalid value\n");
+  }else{
+    convert_value(value_type,value, &unsigned_value);
+    char *pt;
+    int values[2];
+    int i = 0;
+    pt = strtok (range_input,",");
+    while (pt != NULL) {
+      values[i] = atoi(pt);
+      pt = strtok (NULL, ",");
+      i+=1;
+    }
+  
+    msb = values[1];// TODO ; change
+    lsb = values[0];
+printf("lsb %d\n",lsb);printf("msb %d\n",msb);
+    updated_value = get_value_from_bitrange(lsb,msb,unsigned_value);
+    printf("value is : %u\n", updated_value);
+  }
+}
+
 int args_handler(int argc, char** argv){
   unsigned int unsigned_value;
   int bitwidth_argv_length;
@@ -366,7 +434,7 @@ int args_handler(int argc, char** argv){
   unsigned int updated_value;
 
   if(argc == 2){
-    value_type = verify_argv_value(bitwidth,argv[1]);	
+    value_type = verify_argv_value(argv[1]);	
     if(value_type == 0){
       printf("Invalid value\n");
     }else{
@@ -380,49 +448,13 @@ int args_handler(int argc, char** argv){
     char* third_argv = argv[3];
     
     if(first_argv[0] =='-' && first_argv[1] == 'b'){
-      if(check_if_int (bitwidth_argv_length, sec_argv) == 0){
-	bitwidth = chararray_to_integer(sec_argv);
-	if((bitwidth <= 32) && (bitwidth % 4 == 0)){
-	  value_type = verify_argv_value(bitwidth,third_argv);	
-	  if(value_type == 0){
-	    printf("Invalid value\n");
-	  }else{
-	    convert_value(value_type,third_argv, &unsigned_value);
-	    if(bitwidth == 32){
-	      print_info_to_consol(bitwidth,unsigned_value);
-	    }else{
-	      updated_value = change_bit_width(bitwidth, unsigned_value);
-	      print_info_to_consol(bitwidth, updated_value);
-	    }
-	  }
-	}else{
-	  printf("bitwidth not supported\n");
-	}
-      }else{
-	printf("Invalid bitwidth\n");
-      }
+      bitwidth_handler(sec_argv, third_argv);
     }else if(sec_argv[0] =='-' && sec_argv[1] == 'b'){
-      if(check_if_int (bitwidth_argv_length, third_argv) == 0){
-	bitwidth = chararray_to_integer(third_argv);;
-	if((bitwidth <= 32) && (bitwidth % 4 == 0)){
-	  value_type = verify_argv_value(bitwidth,first_argv);
-	  if(value_type == 0){
-	    printf("Invalid value\n");
-	  }else{
-	    convert_value(value_type,first_argv, &unsigned_value);
-	    if(bitwidth == 32){
-	       print_info_to_consol(bitwidth, unsigned_value);
-	    }else{
-	      updated_value = change_bit_width(bitwidth, unsigned_value);
-	      print_info_to_consol(bitwidth, updated_value);
-	    }
-	  }
-	}else{
-	  printf("bitwidth not supported\n");
-	}
-      }else{
-	printf("Invalid bitwidth\n");
-      }
+      bitwidth_handler(third_argv, first_argv);
+    }else if(first_argv[0] == '-' && first_argv[1] == 'r'){
+      bit_twiddel_handler (sec_argv, third_argv);
+    }else if(sec_argv[0] == '-' && sec_argv[1] == 'r'){
+      bit_twiddel_handler (third_argv, first_argv);
     }
   }else{
     printf("Invalid argument input\n");
