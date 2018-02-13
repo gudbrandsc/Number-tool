@@ -506,7 +506,7 @@ args_handler(int argc, char * * argv) {
 
     if (first_argv[0] == '-' && first_argv[1] == 'b') {
       updated_value = bitwidth_handler(sec_argv, third_argv, &bitwidth);
-     if (verify_bit_width(bitwidth) == 0 && get_value_type(third_argv)!= 0 && check_if_int(bitwidth_argv_length, sec_argv) == 0) {
+     if (verify_bit_width(bitwidth) == 0 && get_value_type(third_argv)!= 0 ) {
             print_info_to_consol(bitwidth, updated_value);
       }
       else{
@@ -514,7 +514,7 @@ args_handler(int argc, char * * argv) {
       }
     } else if (sec_argv[0] == '-' && sec_argv[1] == 'b') {
         updated_value = bitwidth_handler(third_argv, first_argv, &bitwidth);
-        if (verify_bit_width(bitwidth) != 0 && get_value_type(first_argv)!= 0 && check_if_int(bitwidth_argv_length, third_argv) == 0) {
+        if (verify_bit_width(bitwidth) == 0 && get_value_type(first_argv)!= 0) {
             print_info_to_consol(bitwidth, updated_value);
       }else{
         printf("Usage: nt <32 bit number> [-r start_range,end_range] [-b bitwidth]\n");
