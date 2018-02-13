@@ -19,22 +19,21 @@ change_bit_width(int width, unsigned int value) {
 
 /*Flips all bits in a char bit array and returns it*/
 char *
-  bit_flip(char * bits, int start) {
-    char * flip_bits = (char * ) malloc(strlen(bits) + 1);
-    size_t bit_length = strlen(bits);
-    strcpy(flip_bits, bits);
-    size_t flip_length = strlen(flip_bits);
-
-    for (int i = start; i < flip_length; i++) {
-      if (bits[i] == '1') {
-        flip_bits[i] = '0';
-      } else {
-        flip_bits[i] = '1';
-      }
+bit_flip(char * bits, int start) {
+  char * flip_bits = (char * ) malloc(strlen(bits) + 1);
+  size_t bit_length = strlen(bits);
+  strcpy(flip_bits, bits);
+  size_t flip_length = strlen(flip_bits);
+  
+  for (int i = start; i < flip_length; i++) {
+    if (bits[i] == '1') {
+      flip_bits[i] = '0';
+    } else {
+      flip_bits[i] = '1';
     }
-
-    return flip_bits;
   }
+  return flip_bits;
+}
 
 /*Method to get the bitvalue from a signed or unsigned integer*/
 void
@@ -42,18 +41,15 @@ int_to_bits(char * s, unsigned int v) {
   int i;
   int bp = 31;
   int bv = 0;
- 
-
   s[0] = '\0';
-
+  
   for (i = 0; i < 32; i++) {
     bv = (v >> bp) & 0b1;
     s[i] = bv ? '1' : '0';
     bp -= 1;
   }
-
   s[i] = '\0';
-
+ 
   return;
 }
 
@@ -62,7 +58,7 @@ unsigned int
 bits_to_int(char * bits) {
   unsigned int value = 0;
   size_t bit_length = strlen(bits);
-
+  
   if (bit_length != 34) {
     //If bitlength is less than then start from first bit value
     for (int i = 2; i < bit_length; i++) {
@@ -90,7 +86,7 @@ bits_to_int_range(char * bits, int msb, int lsb) {
   unsigned int value = 0;
   int startbit = 32 - (msb + 1);
   int endbit = 32 - (lsb + 1);
-
+  
   for (int i = startbit; i <= endbit; i++) {
     if (bits[i] == '1') {
       value = (value * 2) + 1;
@@ -115,34 +111,34 @@ bits_to_unsigned(char * bits, unsigned int * unsigned_value) {
     value = (bits_to_int(flipbit) + 1) * -1;
   } else {
     value = bits_to_int(bits);
-  } * unsigned_value = value;
-
+  } * unsigned_value = value; 
   return 0;
 }
+
 //Get signed integer value from a bitwidth
 int bitwidth_to_signed(char* bits, int msb){
-    int value = 0;
-    int bit_length = strlen(bits);
-    int start = 32 - msb;
-    if(bits[start]=='1'){
-      for (int i = start; i < bit_length; i++) {
-	if (bits[i] == '1') {
-	  value *= 2;
-	} else if (bits[i] == '0') {
-	  value = (value * 2) + 1;
-	}
-      }
-      value = (value + 1) * -1;
-    }else{
-      for (int i = start; i < bit_length; i++) {
-	if (bits[i] == '1') {
-	  value = (value * 2) + 1;
-	} else if (bits[i] == '0') {
-	  value *= 2;
-	}
+  int value = 0;
+  int bit_length = strlen(bits);
+  int start = 32 - msb;
+  if(bits[start]=='1'){
+    for (int i = start; i < bit_length; i++) {
+      if (bits[i] == '1') {
+	value *= 2;
+      } else if (bits[i] == '0') {
+	value = (value * 2) + 1;
       }
     }
-    return value;
+    value = (value + 1) * -1;
+  }else{
+    for (int i = start; i < bit_length; i++) {
+      if (bits[i] == '1') {
+	value = (value * 2) + 1;
+      } else if (bits[i] == '0') {
+	value *= 2;
+      }
+    }
+  }
+  return value;
 }
 /*Return a unsigned int value of the bit*/
 int
@@ -161,7 +157,7 @@ bits_to_unsigned_with_range(char * bits, unsigned int * unsigned_value, int msb,
     value = bits_to_int_range(bits, msb, lsb);
   } 
   * unsigned_value = value;
-
+  
   return 0;
 }
 
@@ -272,7 +268,6 @@ hex_to_unsigned(char * bits, unsigned int * unsigned_value) {
     }
     power *= 16;
   } * unsigned_value = (unsigned) value;
-
   return 0;
 }
 
@@ -281,7 +276,7 @@ int
 pos_int_to_unsigned(char * value, unsigned int * unsigned_value) {
   int int_value = 0;
   int multi = 1;
-
+  
   for (int i = strlen(value) - 1; i >= 0; i--) {
     int_value += ((value[i] - '0') * multi);
     if (int_value < 0) {
@@ -289,9 +284,7 @@ pos_int_to_unsigned(char * value, unsigned int * unsigned_value) {
     }
     multi = (multi * 10);
   }
-
   * unsigned_value = (unsigned) int_value;
-
   return 0;
 }
 
@@ -299,7 +292,7 @@ int
 negativ_int_to_unsigned(char * value, unsigned int * unsigned_value) {
   int int_value = 0;
   int multi = 1;
-
+  
   for (int i = strlen(value) - 1; i >= 1; i--) {
     int_value += ((value[i] - '0') * multi);
     if (int_value < 0) {
@@ -308,8 +301,7 @@ negativ_int_to_unsigned(char * value, unsigned int * unsigned_value) {
     multi = (multi * 10);
   }
   int_value = int_value * (-1);
-  * unsigned_value = (unsigned int) int_value;
-
+  * unsigned_value = (unsigned int) int_value;  
   return 0;
 }
 
@@ -372,7 +364,7 @@ chararray_to_integer(char * value) {
 //Remove som verify argv value can call methods
 void
 convert_value(int type, char * value, unsigned int * unsigned_value) {
-
+  
   if (type == 1) {
     negativ_int_to_unsigned(value, unsigned_value);
   } else if (type == 2) {
@@ -389,7 +381,7 @@ int
 get_value_type(char * value) {
   int value_size = strlen(value);
   int valid_number_type;
-
+  
   if (value[0] == '-' && isdigit(value[1])) { //If value is negativ
     if (check_if_negativ_int(value_size, value) == 0) {
       valid_number_type = 1;
@@ -405,10 +397,10 @@ get_value_type(char * value) {
   } else if (check_if_int(value_size, value) == 0) { //If value is a possetiv integer
     valid_number_type = 4;
   } else {
-
+    
     valid_number_type = 0;
   }
-
+  
   return valid_number_type;
 }
 
@@ -416,15 +408,15 @@ void
 print_info_to_consol(int bitwidth, unsigned int value) {
   char binstr[32];
     unsigned int updated_value;
-
-  int_to_bits(binstr, value);
-  print_bit_in_group(bitwidth, binstr);
-  print_bits_with_prefix(bitwidth, binstr);
-  if (bitwidth == 32) {
+    
+    int_to_bits(binstr, value);
+    print_bit_in_group(bitwidth, binstr);
+    print_bits_with_prefix(bitwidth, binstr);
+    if (bitwidth == 32) {
     printf("0x%08X (base 16)\n", value);
-  } else {
-    printf("0x%X (base 16)\n", value);
-  }
+    } else {
+      printf("0x%X (base 16)\n", value);
+    }
   printf("%u (base 10 unsigned)\n", value);
   int new_value = bitwidth_to_signed(binstr,bitwidth);
   printf("%d (base 10 signed)\n", new_value);
@@ -436,7 +428,7 @@ verify_bit_width(int bitwidth) {
     return 0;
   }
   return 1;
-
+  
 }
 
 //TODO make so returns value
@@ -462,18 +454,18 @@ bit_twiddel_handler(char * range_input, char * value) {
   int value_type;
   int msb;
   int lsb;
-
+  
   value_type = get_value_type(value);
   convert_value(value_type, value, & unsigned_value);
- 
+  
   char * pt;
   int values[2];
   int i = 0;
   pt = strtok(range_input, ",");
   while (pt != NULL) {
-  values[i] = atoi(pt);
-  pt = strtok(NULL, ",");
-  i += 1;
+    values[i] = atoi(pt);
+    pt = strtok(NULL, ",");
+    i += 1;
   }
   
   msb = values[1]; 
@@ -481,10 +473,9 @@ bit_twiddel_handler(char * range_input, char * value) {
   int_to_bits(bitvalue, unsigned_value);
   bits_to_unsigned_with_range(bitvalue, &updated_value, msb, lsb);
  
-
-  return updated_value;
-
+  return updated_value;  
 }
+
 //Function that handles input values from args
 int
 args_handler(int argc, char * * argv) {
@@ -493,45 +484,45 @@ args_handler(int argc, char * * argv) {
   int bitwidth;
   int value_type;
   unsigned int updated_value;
-
+  
   if (argc == 2) {
     value_type = get_value_type(argv[1]);
     if (value_type == 0) {
-        printf("Usage: nt <32 bit number> [-r start_range,end_range] [-b bitwidth]\n");
+      printf("Usage: nt <32 bit number> [-r start_range,end_range] [-b bitwidth]\n");
     }else {
-        convert_value(value_type, argv[1], & unsigned_value);
-        print_info_to_consol(32, unsigned_value);
+      convert_value(value_type, argv[1], & unsigned_value);
+      print_info_to_consol(32, unsigned_value);
     }
-
+    
   } else if (argc == 4) {
     char * first_argv = argv[1];
     char * sec_argv = argv[2];
     char * third_argv = argv[3];
-
+    
     if (first_argv[0] == '-' && first_argv[1] == 'b') {
       updated_value = bitwidth_handler(sec_argv, third_argv, &bitwidth);
-     if (verify_bit_width(bitwidth) == 0 && get_value_type(third_argv)!= 0 ) {
-            print_info_to_consol(bitwidth, updated_value);
+      if (verify_bit_width(bitwidth) == 0 && get_value_type(third_argv)!= 0 ) {
+	print_info_to_consol(bitwidth, updated_value);
       }
       else{
         printf("Usage: nt <32 bit number> [-r start_range,end_range] [-b bitwidth]\n");
       }
     } else if (sec_argv[0] == '-' && sec_argv[1] == 'b') {
-        updated_value = bitwidth_handler(third_argv, first_argv, &bitwidth);
-        if (verify_bit_width(bitwidth) == 0 && get_value_type(first_argv)!= 0) {
-            print_info_to_consol(bitwidth, updated_value);
+      updated_value = bitwidth_handler(third_argv, first_argv, &bitwidth);
+      if (verify_bit_width(bitwidth) == 0 && get_value_type(first_argv)!= 0) {
+	print_info_to_consol(bitwidth, updated_value);
       }else{
         printf("Usage: nt <32 bit number> [-r start_range,end_range] [-b bitwidth]\n");
       }
     } else if (first_argv[0] == '-' && first_argv[1] == 'r') {
       updated_value = bit_twiddel_handler(sec_argv, third_argv);
       if(get_value_type(third_argv)!=0 ){
-         print_info_to_consol(32, updated_value);
+	print_info_to_consol(32, updated_value);
       }
     } else if (sec_argv[0] == '-' && sec_argv[1] == 'r') {
       updated_value = bit_twiddel_handler(third_argv, first_argv);
       if(get_value_type(third_argv)!=0 ){
-         print_info_to_consol(32, updated_value);
+	print_info_to_consol(32, updated_value);
       }    
     }
   }else if(argc == 6){
@@ -540,52 +531,52 @@ args_handler(int argc, char * * argv) {
     char * third_argv = argv[3];
     char * forth_argv = argv[4];
     char * fifth_argv = argv[5];
-
+    
     if((first_argv[0] == '-' && first_argv[1] == 'b') && (forth_argv[0] == '-' && forth_argv[1] == 'r')){
-        updated_value = bit_twiddel_handler(fifth_argv,third_argv);
+      updated_value = bit_twiddel_handler(fifth_argv,third_argv);
         bitwidth = chararray_to_integer(sec_argv);
         updated_value = change_bit_width(bitwidth, updated_value);
         if (verify_bit_width(bitwidth) == 0 && get_value_type(third_argv)!= 0 ) {
-            print_info_to_consol(bitwidth,updated_value);
+	  print_info_to_consol(bitwidth,updated_value);
         }
     }else if((first_argv[0] == '-' && first_argv[1] == 'b') && (third_argv[0] == '-' && third_argv[1] == 'r')){
-        updated_value = bit_twiddel_handler(forth_argv,fifth_argv);
-        bitwidth = chararray_to_integer(sec_argv);
-        updated_value = change_bit_width(bitwidth, updated_value);
+      updated_value = bit_twiddel_handler(forth_argv,fifth_argv);
+      bitwidth = chararray_to_integer(sec_argv);
+      updated_value = change_bit_width(bitwidth, updated_value);
         if (verify_bit_width(bitwidth) == 0 && get_value_type(fifth_argv)!= 0) {
-            print_info_to_consol(bitwidth,updated_value);
+	  print_info_to_consol(bitwidth,updated_value);
         }
     }else if((first_argv[0] == '-' && first_argv[1] == 'r') && (third_argv[0] == '-' && third_argv[1] == 'b')){
-        updated_value = bit_twiddel_handler(sec_argv,fifth_argv);
-        bitwidth = chararray_to_integer(forth_argv);
-        updated_value = change_bit_width(bitwidth, updated_value);
+      updated_value = bit_twiddel_handler(sec_argv,fifth_argv);
+      bitwidth = chararray_to_integer(forth_argv);
+      updated_value = change_bit_width(bitwidth, updated_value);
         if (verify_bit_width(bitwidth) == 0 && get_value_type(fifth_argv)!= 0) {
-            print_info_to_consol(bitwidth,updated_value);
+	  print_info_to_consol(bitwidth,updated_value);
         }
     }else if((first_argv[0] == '-' && first_argv[1] == 'r') && (forth_argv[0] == '-' && forth_argv[1] == 'b')){
-        updated_value = bit_twiddel_handler(sec_argv,third_argv);
+      updated_value = bit_twiddel_handler(sec_argv,third_argv);
         bitwidth = chararray_to_integer(fifth_argv);
         updated_value = change_bit_width(bitwidth, updated_value);
         if (verify_bit_width(bitwidth) == 0 && get_value_type(third_argv)!= 0) {
             print_info_to_consol(bitwidth,updated_value);
         }
     }else if((sec_argv[0] == '-' && sec_argv[1] == 'r') && (forth_argv[0] == '-' && forth_argv[1] == 'b')){
-        updated_value = bit_twiddel_handler(third_argv,first_argv);
-        bitwidth = chararray_to_integer(fifth_argv);
-        updated_value = change_bit_width(bitwidth, updated_value);
+      updated_value = bit_twiddel_handler(third_argv,first_argv);
+      bitwidth = chararray_to_integer(fifth_argv);
+      updated_value = change_bit_width(bitwidth, updated_value);
         if (verify_bit_width(bitwidth) == 0 && get_value_type(fifth_argv)!= 0) {
-        print_info_to_consol(bitwidth,updated_value);
-    }
+	  print_info_to_consol(bitwidth,updated_value);
+	}
     }else if((sec_argv[0] == '-' && sec_argv[1] == 'b') && (forth_argv[0] == '-' && forth_argv[1] == 'r')){
-        updated_value = bit_twiddel_handler(fifth_argv,first_argv);
-        bitwidth = chararray_to_integer(third_argv);
-        updated_value = change_bit_width(bitwidth, updated_value);
-        if (verify_bit_width(bitwidth) == 0 && get_value_type(first_argv)!= 0) {
-            print_info_to_consol(bitwidth,updated_value);
-        }
+      updated_value = bit_twiddel_handler(fifth_argv,first_argv);
+      bitwidth = chararray_to_integer(third_argv);
+      updated_value = change_bit_width(bitwidth, updated_value);
+      if (verify_bit_width(bitwidth) == 0 && get_value_type(first_argv)!= 0) {
+	print_info_to_consol(bitwidth,updated_value);
+      }
     }
   }
-    else {
+  else {
     printf("Usage: nt <32 bit number> [-r start_range,end_range] [-b bitwidth]\n");
     return 1;
   }
