@@ -42,6 +42,7 @@ int_to_bits(char * s, unsigned int v) {
   int i;
   int bp = 31;
   int bv = 0;
+ 
 
   s[0] = '\0';
 
@@ -124,23 +125,23 @@ int bitwidth_to_signed(char* bits, int msb){
     int bit_length = strlen(bits);
     int start = 32 - msb;
     if(bits[start]=='1'){
-    for (int i = start; i < bit_length; i++) {
-      if (bits[i] == '1') {
-         value *= 2;
-      } else if (bits[i] == '0') {
-        value = (value * 2) + 1;
+      for (int i = start; i < bit_length; i++) {
+	if (bits[i] == '1') {
+	  value *= 2;
+	} else if (bits[i] == '0') {
+	  value = (value * 2) + 1;
+	}
       }
-    }
-    value = (value + 1) * -1;
+      value = (value + 1) * -1;
     }else{
-    for (int i = start; i < bit_length; i++) {
-      if (bits[i] == '1') {
-        value = (value * 2) + 1;
-      } else if (bits[i] == '0') {
-        value *= 2;
+      for (int i = start; i < bit_length; i++) {
+	if (bits[i] == '1') {
+	  value = (value * 2) + 1;
+	} else if (bits[i] == '0') {
+	  value *= 2;
+	}
       }
     }
-}
     return value;
 }
 /*Return a unsigned int value of the bit*/
@@ -148,13 +149,14 @@ int
 bits_to_unsigned_with_range(char * bits, unsigned int * unsigned_value, int msb, int lsb) {
   unsigned int value = 0;
   size_t bit_length = strlen(bits);
+  int first = 32 - msb;
   if (bit_length > 34) {
     return 1;
   }
-  if (bits[32-msb] == '1') {
+  if (bits[first] == '1') {
     char * flipbit = bit_flip(bits, msb);
     value = (bits_to_int_range(flipbit, msb, lsb) + 1) * -1;
-    free(flipbit); //check
+    free(flipbit); 
   } else {
     value = bits_to_int_range(bits, msb, lsb);
   } 
@@ -412,7 +414,7 @@ get_value_type(char * value) {
 
 void
 print_info_to_consol(int bitwidth, unsigned int value) {
-  char binstr[MAX_STR_LEN];
+  char binstr[32];
     unsigned int updated_value;
 
   int_to_bits(binstr, value);
@@ -456,28 +458,30 @@ unsigned int
 bit_twiddel_handler(char * range_input, char * value) {
   unsigned int unsigned_value;
   unsigned int updated_value;
-  char bitvalue;
+  char bitvalue[32];
   int value_type;
   int msb;
   int lsb;
 
   value_type = get_value_type(value);
   convert_value(value_type, value, & unsigned_value);
+ 
   char * pt;
   int values[2];
   int i = 0;
   pt = strtok(range_input, ",");
   while (pt != NULL) {
-    values[i] = atoi(pt);
-    pt = strtok(NULL, ",");
-    i += 1;
-    }
-
-    msb = values[1]; // TODO ; change
-    lsb = values[0];
-    int_to_bits( & bitvalue, unsigned_value);
-    bits_to_unsigned_with_range( & bitvalue, & updated_value, msb, lsb);
+  values[i] = atoi(pt);
+  pt = strtok(NULL, ",");
+  i += 1;
+  }
+  
+  msb = values[1]; 
+  lsb = values[0];
+  int_to_bits(bitvalue, unsigned_value);
+  bits_to_unsigned_with_range(bitvalue, &updated_value, msb, lsb);
  
+
   return updated_value;
 
 }
