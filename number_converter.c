@@ -46,8 +46,7 @@ int_to_bits(char * s, unsigned int v) {
     int i;
     int bp = 31;
     int bv = 0;
-    s[0] = '\0';
-
+   
     for (i = 0; i < 32; i++) {
         bv = (v >> bp) & 0b1;
         s[i] = bv ? '1' : '0';
@@ -264,18 +263,20 @@ hex_to_unsigned(char * bits, unsigned int * unsigned_value) {
 /*Convert char array of numbers to unsigned int*/
 int
 pos_int_to_unsigned(char * value, unsigned int * unsigned_value) {
-    int int_value = 0;
+    unsigned int new_value = 0;
+    unsigned int old_value = 0;
     int multi = 1;
     int value_length = strlen(value);
     for (int i = value_length - 1; i >= 0; i--) {
-        int_value += ((value[i] - '0') * multi);
-        if (int_value < 0) {
+        new_value += ((value[i] - '0') * multi);
+	if (old_value >  new_value) {
             return 1;
         }
+	old_value = new_value;;
         multi = (multi * 10);
 
     }
-    * unsigned_value = int_value;
+    * unsigned_value = new_value;
 
     return 0;
 }
@@ -398,8 +399,8 @@ get_value_type(char * value) {
 }
 //Print value to console
 void print_info_to_console(int bit_width, unsigned int value) {
-    char bin_str[32];
-
+    char bin_str[33];
+    
     int_to_bits(bin_str, value);
     print_bit_in_group(bit_width, bin_str);
     print_bits_with_prefix(bit_width, bin_str);
@@ -411,7 +412,7 @@ void print_info_to_console(int bit_width, unsigned int value) {
     printf("%u (base 10 unsigned)\n", value);
     int new_value = bit_width_to_signed(bin_str, bit_width);
     printf("%d (base 10 signed)\n", new_value);
-}
+    }
 
 int verify_bit_width(int bit_width) {
     if ((bit_width <= 32) && (bit_width % 4 == 0)) {
@@ -442,7 +443,7 @@ void get_ranges(char * ranges, int * values){
 }
 
 void bit_twiddle_handler(unsigned int value, int msb, int lsb, unsigned int *updated_value) {
-    char bit_value[32];
+    char bit_value[33];
     unsigned int new_value;
 
     int_to_bits(bit_value, value);
