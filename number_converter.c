@@ -264,12 +264,12 @@ hex_to_unsigned(char * bits, unsigned int * unsigned_value) {
 /*Convert char array of numbers to unsigned int*/
 int
 pos_int_to_unsigned(char * value, unsigned int * unsigned_value) {
-    unsigned int int_value = 0;
+    int int_value = 0;
     int multi = 1;
     int value_length = strlen(value);
     for (int i = value_length - 1; i >= 0; i--) {
         int_value += ((value[i] - '0') * multi);
-        if (int_value <= 0) {
+        if (int_value < 0) {
             return 1;
         }
         multi = (multi * 10);
@@ -288,7 +288,7 @@ negative_int_to_unsigned(char *value, unsigned int *unsigned_value) {
 
     for (int i = value_length - 1; i >= 1; i--) {
         int_value += ((value[i] - '0') * multi);
-        if (int_value <= 0) {
+        if (int_value < 0) {
             return 1;
         }
         multi = (multi * 10);
