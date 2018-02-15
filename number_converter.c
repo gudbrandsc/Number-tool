@@ -17,9 +17,12 @@ unsigned int
 change_bit_width(int width, unsigned int value) {
     unsigned  mask;
     unsigned int new_value;
-
-    mask = (1 << width) - 1;
-    new_value = value & mask;
+    if(width != 32){
+      mask = (1 << width) - 1;
+      new_value = value & mask;
+    }else{
+      new_value  =  value;
+	}
     return new_value;
 }
 
@@ -197,66 +200,22 @@ int
 hex_to_unsigned(char * bits, unsigned int * unsigned_value) {
     int value = 0;
     int bit_length = strlen(bits);
-    int power = 1;
-    int place = 0;
+    int base = 1;    
+    
     for (int i = bit_length - 1; i > 1; i--) {
-        switch (bits[i]) {
-            case '0':
-                break;
-            case '1':
-                place = 1;
-                break;
-            case '2':
-                place = 2;
-                break;
-            case '3':
-                place = 3;
-                break;
-            case '4':
-                place = 4;
-                break;
-            case '5':
-                place = 5;
-                break;
-            case '6':
-                place = 6;
-                break;
-            case '7':
-                place = 7;
-                break;
-            case '8':
-                place = 8;
-                break;
-            case '9':
-                place = 9;
-                break;
-            case 'A':
-                place = 10;
-                break;
-            case 'B':
-                place = 11;
-                break;
-            case 'C':
-                place = 12;
-                break;
-            case 'D':
-                place = 13;
-                break;
-            case 'E':
-                place = 14;
-                break;
-            case 'F':
-                place = 15;
-                break;
-            default:
-                return 1;
-        }
-        value += place * power;
-        if (value <= 0) {
-            return 1;
-        }
-        power *= 16;
-    } * unsigned_value = (unsigned) value;
+      if(bits[i] >= '0' && bits[i] <='9'){
+	value += (bits[i] - 48)*base;
+	base = base * 16;
+      }else if(bits[i] >= 'A' && bits[i] <= 'F'){
+	value += (bits[i] - 55)*base;
+	base = base * 16;
+      }
+      printf("Value %d\n",bits[i]);
+    }
+    if(value <= 0){
+      return 1;
+      }
+    * unsigned_value = (unsigned) value;
     return 0;
 }
 
@@ -445,7 +404,6 @@ void get_ranges(char * ranges, int * values){
 void bit_twiddle_handler(unsigned int value, int msb, int lsb, unsigned int *updated_value) {
     char bit_value[33];
     unsigned int new_value;
-
     int_to_bits(bit_value, value);
     bits_to_unsigned_with_range(bit_value, &new_value, msb, lsb);
     *updated_value =  new_value;
@@ -490,7 +448,6 @@ void args_handler(int argc, char * * argv, struct Input_value_info* value_info) 
     }
     build_input_struct(&value_info, input_number, value_type, bit_width, start_range, end_range);
 }
-
 int main(int argc, char * argv[]) {
     struct Input_value_info input_info;
     unsigned int unsigned_value;
@@ -503,15 +460,10 @@ int main(int argc, char * argv[]) {
     if(input_info.type == 0 || verify_bit_width(input_info.bit_width) == 1 || verify_range(input_info.end_range,input_info.start_range) == 1 || valid_32bit == 1){
         printf("Usage: nt <32 bit number> [-r start_range,end_range] [-b bit_width]\n");
     }else{
-        if(input_info.start_range !=0 || input_info.end_range != 32){
-            bit_twiddle_handler(unsigned_value, input_info.end_range, input_info.start_range, &updated_value);
-            unsigned_value = updated_value;
-        }
-        if(input_info.bit_width != 32){
-            updated_value = change_bit_width(input_info.bit_width,unsigned_value);
-            unsigned_value = updated_value;
-        }
-        print_info_to_console(input_info.bit_width, unsigned_value);
+      bit_twiddle_handler(unsigned_value, input_info.end_range, input_info.start_range, &updated_value);
+      unsigned_value = updated_value;
+      updated_value = change_bit_width(input_info.bit_width, unsigned_value);
+      print_info_to_console(input_info.bit_width, unsigned_value);
     }
     return 0;
 }
