@@ -222,20 +222,20 @@ hex_to_unsigned(char * bits, unsigned int * unsigned_value) {
 /*Convert char array of numbers to unsigned int*/
 int
 pos_int_to_unsigned(char * value, unsigned int * unsigned_value) {
-    unsigned int new_value = 0;
-    unsigned int old_value = 0;
+    int new_value = 0;
+    int old_value = 0;
     int multi = 1;
     int value_length = strlen(value);
     for (int i = value_length - 1; i >= 0; i--) {
         new_value += ((value[i] - '0') * multi);
-	if (old_value >  new_value) {
+        if (old_value >  new_value) {
             return 1;
         }
-	old_value = new_value;;
+        old_value = new_value;
         multi = (multi * 10);
 
     }
-    * unsigned_value = new_value;
+    * unsigned_value = (unsigned)new_value;
 
     return 0;
 }
