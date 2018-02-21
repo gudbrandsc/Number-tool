@@ -222,8 +222,8 @@ hex_to_unsigned(char * bits, unsigned int * unsigned_value) {
 /*Convert char array of numbers to unsigned int*/
 int
 pos_int_to_unsigned(char * value, unsigned int * unsigned_value) {
-    int new_value = 0;
-    int old_value = 0;
+    unsigned int new_value = 0;
+    unsigned int old_value = 0;
     int multi = 1;
     int value_length = strlen(value);
     for (int i = value_length - 1; i >= 0; i--) {
