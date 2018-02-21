@@ -255,6 +255,7 @@ negative_int_to_unsigned(char *value, unsigned int *unsigned_value) {
     }
     int_value = int_value * (-1);
     * unsigned_value = (unsigned int) int_value;
+
     return 0;
 }
 
@@ -403,10 +404,14 @@ void get_ranges(char * ranges, int * values){
 
 void bit_twiddle_handler(unsigned int value, int msb, int lsb, unsigned int *updated_value) {
     char bit_value[33];
+    if(msb==32 && lsb==0){
+        *updated_value = value;
+    }else{
     unsigned int new_value;
     int_to_bits(bit_value, value);
     bits_to_unsigned_with_range(bit_value, &new_value, msb, lsb);
     *updated_value =  new_value;
+    }
 }
 
 void build_input_struct(struct Input_value_info **value_info, char *number, int type, int bit_width, int start_range, int end_range){
@@ -460,10 +465,9 @@ int main(int argc, char * argv[]) {
     if(input_info.type == 0 || verify_bit_width(input_info.bit_width) == 1 || verify_range(input_info.end_range,input_info.start_range) == 1 || valid_32bit == 1){
         printf("Usage: nt <32 bit number> [-r start_range,end_range] [-b bit_width]\n");
     }else{
-      bit_twiddle_handler(unsigned_value, input_info.end_range, input_info.start_range, &updated_value);
-      unsigned_value = updated_value;
-      updated_value = change_bit_width(input_info.bit_width, unsigned_value);
-      print_info_to_console(input_info.bit_width, unsigned_value);
+        bit_twiddle_handler(unsigned_value, input_info.end_range, input_info.start_range, &updated_value);
+        updated_value = change_bit_width(input_info.bit_width, unsigned_value);
+        print_info_to_console(input_info.bit_width, unsigned_value);
     }
     return 0;
 }
